@@ -83,9 +83,10 @@ $messageForm.addEventListener('submit', (e) => {
         if (error) {
             return console.log(error)
         }
-
         console.log('Message delivered!')
     })
+
+    socket.emit('showTyping', 'messageSend')
 })
 
 $sendLocationButton.addEventListener('click', () => {
@@ -104,6 +105,18 @@ $sendLocationButton.addEventListener('click', () => {
             console.log('Location shared!')  
         })
     })
+})
+
+$messageFormInput.addEventListener("keypress", () => {
+    socket.emit('showTyping')
+})
+
+
+socket.on('userTyping', (user) => {
+    if (user.isTyping) {
+       return $messageFormInput.setAttribute('placeholder', `${user.username} typing ....`)
+    }
+    $messageFormInput.setAttribute('placeholder', 'Message')
 })
 
 socket.emit('join', { username, room }, (error) => {

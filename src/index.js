@@ -25,6 +25,13 @@ io.on('connection', (socket) => {
             return callback(error)
         }
 
+        // A room is an arbitrary channel that sockets can join and leave. 
+        //It can be used to broadcast events to a subset of clients:
+
+        //You can call join to subscribe the socket to a given channel:
+
+        //And then simply use to or in (they are the same) when broadcasting or emitting:
+
         socket.join(user.room)
 
         socket.emit('message', generateMessage('Admin', 'Welcome!'))
@@ -35,6 +42,12 @@ io.on('connection', (socket) => {
         })
 
         callback()
+    })
+
+    socket.on('showTyping', (messageSend) => {
+        const user = getUser(socket.id)
+        user.isTyping = messageSend ? false : true;
+        socket.broadcast.to(user.room).emit('userTyping', user)
     })
 
     socket.on('sendMessage', (message, callback) => {
